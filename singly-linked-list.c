@@ -138,23 +138,35 @@ int insertFirst(headNode* h, int key){
 }
 
 int insertNode(headNode* h, int key){
-        listNode *p = h->first; // 리스트를 움직이며 key값을 비교할 node포인터
-        listNode *trail = h->first; // p 한칸 뒤에서 따라가는 포인터(삽입용)
+        listNode *p = h->first; // 리스트를 움직이며 key값을 비교할 node포인터, 초기값 => 첫 노드
         
         listNode *node = (listNode*)malloc(sizeof(listNode));
-        node->key = key;
+        node->key = key; // 추가될 node key값 삽입
+        node->link = NULL; //추가될 node link 초기화
         
-        if(node->key < p->key){ // first앞에 삽입되는 경우
-                node->link = h->first; // 삽입될 node의 link는 기존의 first노드를 가리킨다.
-                h->first = node; // first는 삽입될 link이다.
+        while (node->key>=p->key) // 삽입될 node의 key값이 더크면
+        {       
+                node->link = p; // 삽입될 node의 link에 p 대입(p 이전 노드로 따라감)
+                p = p->link; //p는 다음 노드로 이동
+                if (p->link==NULL)
+                {
+                        break;
+                } // 끝까지 가도 더 큰 key가 없으면 break
+                
         }
-        else{   
-                while(node->key < p->key){
-                        p = p->link; // p는 다음 node를 가리킴
-                        
 
-                }
-
+        if (node->link==NULL)//first로 삽입되는 경우
+        {
+                node->link = p; // 삽입될 node는 기존 first를 포인팅
+                h->first = node; // 헤드노드는 삽입될 node를 포인팅
+        }
+        else if(p==NULL){ // last로 삽입되는 경우
+                p->link = node; // 기존 last가 삽입될 node를 포인팅
+                node->link = NULL; // 삽입될 node가 last이므로 link에 NULL을 넣어준다.
+        }
+        else{ //중간에 삽입
+                node->link->link = node; // node의 link는 node가 삽입될 위치의 직전 node이므로, node를 가리키게 해줌
+                node->link = p; // node가 삽입될 위치의 다음 node(p가 가리키는 node)를 포인팅
         }
 
 
@@ -178,11 +190,32 @@ int insertLast(headNode* h, int key){
 }
 
 int deleteFirst(headNode* h){
-
+        listNode* prev = h->first; // 첫 노드를 가리키는 노드 포인터
+        h->first = prev->link; // first를 다음 노드로 변경
+        free(prev); //기존 first 할당 해제
         return 0;
 }
 
 int deleteLast(headNode* h) {
+        listNode* p = h->first;
+        listNode* trail = h->first;
+
+        while(p->link != NULL){
+                trail = p;
+                p = p->link;
+        }
+
+        free(p); // last 노드 할당 해제(delete)
+
+        if (trail == h->first) // 노드가 1개였던 경우
+        {        
+                h->first = NULL; // 빈 리스트이므로 헤드는 NULL
+        }
+        else{       
+                trail->link = NULL; //해제된 노드의 이전 노드가 last가 되므로, 이전 노드의 link에 NULL대입
+        }
+        
+        
 
 	return 0; 
 }
