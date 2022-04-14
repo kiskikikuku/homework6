@@ -44,7 +44,7 @@ int main(){
 		printf("----------------------------------------------------------------\n");
 
         printf("Command = ");
-        scanff(" %c", &command);
+        scanf(" %c", &command);
 
         switch(command){
         case 'z': case 'Z':
@@ -69,7 +69,7 @@ int main(){
         case 'n': case'N' :
                 printf("Your Key = ");
                 scanf("%d", &key);
-                insertast(headnode, key);
+                insertLast(headnode, key);
                 break;
         case 'e': case 'E':
                 deleteLast(headnode);
@@ -144,31 +144,45 @@ int insertNode(headNode* h, int key){
         node->key = key; // 추가될 node key값 삽입
         node->link = NULL; //추가될 node link 초기화
         
-        while (node->key>=p->key) // 삽입될 node의 key값이 더크면
-        {       
-                node->link = p; // 삽입될 node의 link에 p 대입(p 이전 노드로 따라감)
-                p = p->link; //p는 다음 노드로 이동
-                if (p->link==NULL)
-                {
-                        break;
-                } // 끝까지 가도 더 큰 key가 없으면 break
-                
-        }
-
-        if (node->link==NULL)//first로 삽입되는 경우
+        if (h->first==NULL)// 공백 노드에 삽입되는 경우
         {
-                node->link = p; // 삽입될 node는 기존 first를 포인팅
+                node->link = NULL; 
                 h->first = node; // 헤드노드는 삽입될 node를 포인팅
-        }
-        else if(p==NULL){ // last로 삽입되는 경우
-                p->link = node; // 기존 last가 삽입될 node를 포인팅
-                node->link = NULL; // 삽입될 node가 last이므로 link에 NULL을 넣어준다.
-        }
-        else{ //중간에 삽입
-                node->link->link = node; // node의 link는 node가 삽입될 위치의 직전 node이므로, node를 가리키게 해줌
-                node->link = p; // node가 삽입될 위치의 다음 node(p가 가리키는 node)를 포인팅
+                return 0;
         }
 
+        while (key>=(p->key)) // 삽입될 node의 key값이 더크면
+        {       
+             if (p->link == NULL)
+             {        
+                     break;
+             }
+                
+             if (key>=(p->link->key))
+                {
+                        p = p->link;
+                        
+                }
+                else{
+                        break;
+                }
+        }
+
+
+        if(p == h->first && key<=p->key){ //first위치에 삽입되는 경우
+                node->link = p;
+                h->first = node;
+        }
+        else if (p->link == NULL) // last위치에 삽입되는 경우
+        {
+                node->link = NULL;
+                p->link = node;
+        }
+        else{ //중간에 삽입되는 경우
+                node->link = p->link;
+                p->link = node;
+        }
+       
 
         return 0;
 }
@@ -177,14 +191,38 @@ int insertLast(headNode* h, int key){
         
         listNode* node = (listNode*)malloc(sizeof(listNode)); // node 1개 추가
         node->key = key; // 삽입될 node의 key값을 채워준다.
+        node->link = NULL;
 
         listNode* p = h->first; // p가 첫 node를 가리킨다.
-        while (p != NULL) // p가 NULL일때까지(마지막 node)
+        while (p->link != NULL) // p가 NULL일때까지(마지막 node)
         {
                 p = p->link; // p를 계속 다음 node를 가리키게 함
         }
         
         p->link = node; // 기존의 마지막 node의 링크가 삽입될 node와 연결된다.
+
+        return 0;
+}
+
+int deleteNode(headNode* h, int key){
+        
+        listNode* p = h->first;
+        listNode* trail = NULL;
+
+        while(p->key != key){
+                trail = p;
+                p = p->link;
+        }
+
+        if(trail){ 
+                trail->link = p->link; //이전 노드를 p의 다음 노드에 연결
+        } // first가 아닌 노드를 삭제하는 경우
+
+        else{
+                h->first = p->link;
+        } //first를 삭제하는 경우
+
+        free(p); // 노드 삭제
 
         return 0;
 }
@@ -222,6 +260,27 @@ int deleteLast(headNode* h) {
 
 int invertList(headNode* h) {
 
+        listNode* p = h->first;
+        listNode* tail = NULL;
+        listNode* front = p->link;
+
+        if (p->link == NULL) //1개짜리 연결리스트
+        {
+                return 0;
+        }
+
+        while (p->link != NULL) //따라가는 노드 포인터가 0이 될때까지
+        {
+              p->link = tail;
+              tail = p;
+              p = front;
+              front = front->link;
+        }
+
+        p->link = tail;
+        h->first = p;
+
+        
 	return 0;
 }
 
