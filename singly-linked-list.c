@@ -191,7 +191,6 @@ int insertLast(headNode* h, int key){
         
         listNode* node = (listNode*)malloc(sizeof(listNode)); // node 1개 추가
         node->key = key; // 삽입될 node의 key값을 채워준다.
-        node->link = NULL;
 
         listNode* p = h->first; // p가 첫 node를 가리킨다.
         while (p->link != NULL) // p가 NULL일때까지(마지막 node)
@@ -200,6 +199,7 @@ int insertLast(headNode* h, int key){
         }
         
         p->link = node; // 기존의 마지막 node의 링크가 삽입될 node와 연결된다.
+        node->link = NULL;
 
         return 0;
 }
@@ -245,7 +245,7 @@ int deleteLast(headNode* h) {
 
         free(p); // last 노드 할당 해제(delete)
 
-        if (trail == h->first) // 노드가 1개였던 경우
+        if (p == h->first) // 노드가 1개였던 경우
         {        
                 h->first = NULL; // 빈 리스트이므로 헤드는 NULL
         }
