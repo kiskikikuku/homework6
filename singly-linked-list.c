@@ -189,17 +189,23 @@ int insertNode(headNode* h, int key){
 
 int insertLast(headNode* h, int key){
         
-        listNode* node = (listNode*)malloc(sizeof(listNode)); // node 1개 추가
-        node->key = key; // 삽입될 node의 key값을 채워준다.
+        listNode* node = (listNode*)malloc(sizeof(listNode));
+        listNode* p = h->first;
 
-        listNode* p = h->first; // p가 첫 node를 가리킨다.
-        while (p->link != NULL) // p가 NULL일때까지(마지막 node)
-        {
-                p = p->link; // p를 계속 다음 node를 가리키게 함
-        }
-        
-        p->link = node; // 기존의 마지막 node의 링크가 삽입될 node와 연결된다.
+        node->key = key;
         node->link = NULL;
+
+        if(p == NULL){ //공백 리스트
+                h->first = node;
+        }
+
+        else{
+                 while (p->link != NULL)
+                {
+                        p = p->link;
+                }
+                p->link = node;
+        }
 
         return 0;
 }
